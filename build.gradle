@@ -1,0 +1,62 @@
+plugins {
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
+	id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+	archivesName = project.archives_base_name
+}
+
+repositories {
+	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+}
+
+dependencies {
+	// To change the versions see the gradle.properties file
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	// Mod is client-only and does not need the full Fabric API; the loader alone is enough.
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+}
+
+processResources {
+	filteringCharset = 'UTF-8'
+	def version = project.version
+	inputs.property "version", version
+
+	filesMatching("fabric.mod.json") {
+		expand "version": version
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.encoding = 'UTF-8'
+	it.options.release = 25
+}
+
+java {
+	withSourcesJar()
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
+}
+
+jar {
+	from("LICENSE") {
+		rename { "${it}_${project.name}" }
+	}
+}
+
+// configure the maven publication
+publishing {
+	publications {
+		create("mavenJava", MavenPublication) {
+			from components.java
+		}
+	}
+
+	repositories {
+		// Add repositories to publish to here.
+	}
+}

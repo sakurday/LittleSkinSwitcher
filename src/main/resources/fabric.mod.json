@@ -1,0 +1,25 @@
+{
+	"schemaVersion": 1,
+	"id": "littleskin-switcher",
+	"version": "${version}",
+	"name": "LittleSkin Switcher",
+	"description": "在游戏内切换正版账户与 LittleSkin 皮肤站登录。默认使用正版登录，每个服务器可单独标记为使用 LittleSkin 登录。",
+	"authors": [
+		"sakurday"
+	],
+	"license": "MIT",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"com.littleskin.switcher.LittleSkinSwitcher"
+		]
+	},
+	"mixins": [
+		"littleskin-switcher.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "~26.1.2",
+		"java": ">=25"
+	}
+}

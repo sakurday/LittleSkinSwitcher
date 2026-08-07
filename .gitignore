@@ -1,0 +1,9 @@
+.gradle/
+build/
+run/
+.out/
+*.iml
+.idea/
+.vscode/
+.build-cache/
+.claude/
