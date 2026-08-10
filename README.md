@@ -1,6 +1,6 @@
 # LittleSkinSwitcher
 
-![](C:/Users/sakurday/AppData/Roaming/marktext/images/07f6ae63c0ad8271a41c020ea328aed34f05f9b9.png)
+![](./image1.png)
 
 Littleskin and Microsoft Multilogin in Minecraft
 
