@@ -24,4 +24,4 @@ Littleskin and Microsoft Multilogin in Minecraft
 
 # AI生成内容声明
 
-本模组绝大部分内容由Deepseek生成
+本模组绝大部分内容由Claude Code使用Deepseek模型生成
