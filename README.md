@@ -18,22 +18,9 @@ Littleskin and Microsoft Multilogin in Minecraft
 
 单人游戏默认全部使用正版登录。
 
-# 多语言
-
-界面使用 Minecraft 标准多语言机制：文案全部为 `Component.translatable` 翻译键，语言文件位于
-`assets/littleskin-switcher/lang/`，在游戏内「选项 → 语言…」中切换即可（香港繁体、文言语种已由本模组注册进语言列表）。
-
-| 语言文件 | 语言 |
-| --- | --- |
-| `en_us.json` | English（默认，也是缺失翻译键的回退） |
-| `zh_cn.json` | 简体中文 |
-| `zh_tw.json` | 繁體中文（台灣） |
-| `zh_hk.json` | 繁體中文（香港） |
-| `lzh.json` | 文言 |
-
 # 依赖
 
-需要安装 **Fabric API**（用于把模组的语言文件等资源挂载进游戏）。
+需要安装 **Fabric API**
 
 # 注意事项
 
