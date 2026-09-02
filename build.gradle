@@ -17,7 +17,8 @@ repositories {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	// Mod is client-only and does not need the full Fabric API; the loader alone is enough.
+	// Mod is client-only and does not need the full Fabric API on the compile classpath;
+	// fabric-api is only required at runtime (its resource loader mounts the mod's lang assets).
 	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 }
 

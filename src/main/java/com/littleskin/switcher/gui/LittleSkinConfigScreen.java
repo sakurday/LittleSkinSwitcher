@@ -16,6 +16,9 @@ import net.minecraft.util.Util;
 /**
  * LittleSkin 配置界面：输入账号密码并登录，状态显示在下方。
  * 登录成功后凭证保存在配置文件中，进入 LittleSkin 服务器时自动使用。
+ *
+ * 界面文案全部使用 Minecraft 标准翻译键（Component.translatable），
+ * 跟随游戏“选项 → 语言…”选择切换（含模组自带的 香港繁体 / 文言）。
  */
 public class LittleSkinConfigScreen extends Screen {
     private final Screen lastScreen;
@@ -26,25 +29,28 @@ public class LittleSkinConfigScreen extends Screen {
     private boolean loggingIn = false;
 
     public LittleSkinConfigScreen(Screen lastScreen) {
-        super(Component.literal("LittleSkin 配置"));
+        super(Component.translatable("littleskin-switcher.configScreen.title"));
         this.lastScreen = lastScreen;
     }
 
     @Override
     protected void init() {
         int cx = this.width / 2;
-        this.emailField = new EditBox(this.font, cx - 100, 76, 200, 20, Component.literal("LittleSkin 账号（邮箱）"));
+        this.emailField = new EditBox(this.font, cx - 100, 76, 200, 20,
+                Component.translatable("littleskin-switcher.configScreen.account"));
         this.emailField.setValue(ModConfig.get().account.email);
         this.emailField.setMaxLength(128);
         this.addWidget(this.emailField);
 
-        this.passwordField = new EditBox(this.font, cx - 100, 106, 200, 20, Component.literal("密码"));
+        this.passwordField = new EditBox(this.font, cx - 100, 106, 200, 20,
+                Component.translatable("littleskin-switcher.configScreen.password"));
         this.passwordField.setValue(ModConfig.get().account.password);
         this.passwordField.setMaxLength(128);
         this.addWidget(this.passwordField);
 
         this.loginButton = this.addRenderableWidget(
-                Button.builder(Component.literal("登录 / 保存"), button -> this.tryLogin())
+                Button.builder(Component.translatable("littleskin-switcher.configScreen.login"),
+                                button -> this.tryLogin())
                         .bounds(cx - 100, 136, 200, 20)
                         .build());
         this.addRenderableWidget(
@@ -54,7 +60,8 @@ public class LittleSkinConfigScreen extends Screen {
 
         ModConfig cfg = ModConfig.get();
         if (!cfg.account.profileName.isEmpty() && cfg.account.valid) {
-            this.status = Component.literal("已登录 LittleSkin：" + cfg.account.profileName);
+            this.status = Component.translatable("littleskin-switcher.configScreen.status.loggedIn",
+                    cfg.account.profileName);
         }
         this.setInitialFocus(this.emailField);
     }
@@ -80,11 +87,11 @@ public class LittleSkinConfigScreen extends Screen {
         String email = this.emailField.getValue();
         String password = this.passwordField.getValue();
         if (email.isEmpty() || password.isEmpty()) {
-            this.status = Component.literal("请输入账号和密码");
+            this.status = Component.translatable("littleskin-switcher.configScreen.status.needInput");
             return;
         }
         this.loggingIn = true;
-        this.status = Component.literal("正在登录 LittleSkin...");
+        this.status = Component.translatable("littleskin-switcher.configScreen.status.loggingIn");
         this.loginButton.active = false;
 
         Util.ioPool().execute(() -> {
@@ -103,14 +110,16 @@ public class LittleSkinConfigScreen extends Screen {
                 cfg.save();
                 String profileName = result.profileName;
                 Minecraft.getInstance().execute(() -> {
-                    this.status = Component.literal("登录成功：" + profileName);
+                    this.status = Component.translatable("littleskin-switcher.configScreen.status.success",
+                            profileName);
                     this.loggingIn = false;
                     this.loginButton.active = true;
                 });
             } catch (Exception e) {
                 String message = e.getMessage() == null ? e.toString() : e.getMessage();
                 Minecraft.getInstance().execute(() -> {
-                    this.status = Component.literal("登录失败：" + message);
+                    this.status = Component.translatable("littleskin-switcher.configScreen.status.failed",
+                            message);
                     this.loggingIn = false;
                     this.loginButton.active = true;
                 });
@@ -134,8 +143,10 @@ public class LittleSkinConfigScreen extends Screen {
         super.extractRenderState(graphics, mouseX, mouseY, a);
         int cx = this.width / 2;
         graphics.centeredText(this.font, this.title, cx, 20, -1);
-        graphics.text(this.font, Component.literal("LittleSkin 账号（邮箱）"), cx - 100 + 1, 62, -6250336);
-        graphics.text(this.font, Component.literal("密码"), cx - 100 + 1, 92, -6250336);
+        graphics.text(this.font, Component.translatable("littleskin-switcher.configScreen.account"),
+                cx - 100 + 1, 62, -6250336);
+        graphics.text(this.font, Component.translatable("littleskin-switcher.configScreen.password"),
+                cx - 100 + 1, 92, -6250336);
         graphics.text(this.font, this.status, cx - 100 + 1, 196, -1);
         this.emailField.extractRenderState(graphics, mouseX, mouseY, a);
         this.passwordField.extractRenderState(graphics, mouseX, mouseY, a);

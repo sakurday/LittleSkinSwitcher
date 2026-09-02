@@ -1,0 +1,16 @@
+{
+  "pack": {
+    "pack_format": 46,
+    "description": "LittleSkin Switcher language files"
+  },
+  "language": {
+    "zh_hk": {
+      "name": "繁體中文（香港）",
+      "region": "HK"
+    },
+    "lzh": {
+      "name": "文言",
+      "region": "CN"
+    }
+  }
+}

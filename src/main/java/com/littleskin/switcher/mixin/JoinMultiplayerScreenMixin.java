@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
  * 服务器列表界面（JoinMultiplayerScreen）：
- *  - 左上角添加“配置 LittleSkin”按钮；
+ *  - 左上角添加“配置 LittleSkin”按钮（文案为标准翻译键，切换语言即时生效）；
  *  - 连接服务器前根据目标服务器切换正版 / LittleSkin 会话。
  */
 @Mixin(JoinMultiplayerScreen.class)
@@ -30,7 +30,7 @@ public abstract class JoinMultiplayerScreenMixin {
         SessionController.deactivateLittleSkin();
 
         ((ScreenAccessor) self).littleskin_addRenderableWidget(
-                Button.builder(Component.literal("配置 LittleSkin"),
+                Button.builder(Component.translatable("littleskin-switcher.configureButton"),
                                 button -> Minecraft.getInstance().setScreen(new LittleSkinConfigScreen(self)))
                         .bounds(5, 6, 100, 20)
                         .build());
@@ -53,7 +53,7 @@ public abstract class JoinMultiplayerScreenMixin {
                 SystemToast.addOrUpdate(
                         mc.getToastManager(),
                         SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
-                        Component.literal("LittleSkin 登录失败"),
+                        Component.translatable("littleskin-switcher.toast.loginFailedTitle"),
                         Component.literal(message));
             }
         } else {

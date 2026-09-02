@@ -6,6 +6,7 @@ import com.littleskin.switcher.config.ModConfig;
 import com.littleskin.switcher.mixin.MinecraftAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.User;
+import net.minecraft.network.chat.Component;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -63,7 +64,8 @@ public final class SessionController {
 
         UUID uuid = uuidFromString(cfg.account.profileUuid);
         if (uuid == null) {
-            throw new IllegalStateException("LittleSkin 返回了无效的角色 UUID");
+            throw new IllegalStateException(
+                    Component.translatable("littleskin-switcher.error.invalidProfileUuid").getString());
         }
         User littleSkinUser = new User(cfg.account.profileName, uuid, cfg.account.accessToken, Optional.empty(), Optional.empty());
         ((MinecraftAccessor) Minecraft.getInstance()).littleskin_setUser(littleSkinUser);
@@ -86,7 +88,8 @@ public final class SessionController {
 
         if (cfg.account.email == null || cfg.account.email.isEmpty()
                 || cfg.account.password == null || cfg.account.password.isEmpty()) {
-            throw new IllegalStateException("尚未配置 LittleSkin 账号，请点击服务器列表左上角的“配置 LittleSkin”登录");
+            throw new IllegalStateException(
+                    Component.translatable("littleskin-switcher.error.notConfigured").getString());
         }
         return LittleSkinAuth.authenticate(cfg.account.email, cfg.account.password);
     }
