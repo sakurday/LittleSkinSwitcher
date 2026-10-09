@@ -1,9 +1,13 @@
 package com.littleskin.switcher.mixin;
 
+import com.littleskin.switcher.config.Account;
 import com.littleskin.switcher.config.ModConfig;
+import com.littleskin.switcher.gui.ServerAccountScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.chat.Component;
@@ -18,16 +22,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
  * 服务器列表中的每个在线服务器条目：
- *  - 右下角渲染“使用 LittleSkin / 使用正版”切换按钮与标记（文字走 Minecraft 标准多语言，
- *    按当前语言解析后的内容自动定宽）；
- *  - 点击按钮切换该服务器的 LittleSkin 登录标记（持久化到配置）。
+ *  - 右下角显示这台服务器当前使用的账号；
+ *  - 点击打开账号选择界面。
  */
 @Mixin(targets = "net.minecraft.client.gui.screens.multiplayer.ServerSelectionList$OnlineServerEntry")
 public abstract class OnlineServerEntryMixin {
-    private static final String KEY_USE_LITTLESKIN = "littleskin-switcher.serverList.useLittleSkin";
-    private static final String KEY_USE_PREMIUM = "littleskin-switcher.serverList.usePremium";
-    private static final int TOGGLE_HEIGHT = 12;
+    private static final int PILL_HEIGHT = 12;
     private static final int TEXT_PAD = 4;
+
+    private static final int COLOR_LAUNCHER = 0xA05A5A5A;
+    private static final int COLOR_YGGDRASIL = 0xA0FFB300;
+    private static final int COLOR_YGGDRASIL_UNVERIFIED = 0xA0B04040;
 
     @Shadow
     @Final
@@ -37,7 +42,6 @@ public abstract class OnlineServerEntryMixin {
     @Final
     private Minecraft minecraft;
 
-    /** 上次渲染时的切换按钮矩形，供点击判定使用（与画面所见一致）。 */
     @Unique
     private int littleskin_pillX;
     @Unique
@@ -48,37 +52,43 @@ public abstract class OnlineServerEntryMixin {
     private int littleskin_pillH;
 
     @Inject(method = "extractContent", at = @At("RETURN"))
-    private void littleskin_renderToggle(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float a, CallbackInfo ci) {
+    private void littleskin_renderPill(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float a, CallbackInfo ci) {
         ObjectSelectionList.Entry<?> entry = (ObjectSelectionList.Entry<?>) (Object) this;
-        boolean active = ModConfig.get().isLittleSkinServer(this.serverData.ip);
-        Component label = Component.translatable(active ? KEY_USE_LITTLESKIN : KEY_USE_PREMIUM);
-        int w = Math.max(44, this.minecraft.font.width(label.getString()) + TEXT_PAD * 2);
+        Account account = ModConfig.get().accountForServer(this.serverData.ip);
+        Component label = account.label();
+
+        int w = Math.max(44, this.minecraft.font.width(label) + TEXT_PAD * 2);
         int x = entry.getContentRight() - w - 2;
-        int y = entry.getContentBottom() - TOGGLE_HEIGHT - 1;
+        int y = entry.getContentBottom() - PILL_HEIGHT - 1;
         this.littleskin_pillX = x;
         this.littleskin_pillY = y;
         this.littleskin_pillW = w;
-        this.littleskin_pillH = TOGGLE_HEIGHT;
-        // 背景胶囊：LittleSkin 为橙色，正版为灰色。文字反映当前登录方式。
-        graphics.fill(x, y, x + w, y + TOGGLE_HEIGHT, active ? 0xA0FFB300 : 0xA05A5A5A);
-        graphics.text(this.minecraft.font, label, x + TEXT_PAD, y + 2, active ? 0xFF202020 : 0xFFD0D0D0);
+        this.littleskin_pillH = PILL_HEIGHT;
+
+        int background = account.isLauncher()
+                ? COLOR_LAUNCHER
+                : (account.lastValid ? COLOR_YGGDRASIL : COLOR_YGGDRASIL_UNVERIFIED);
+        graphics.fill(x, y, x + w, y + PILL_HEIGHT, background);
+        graphics.text(this.minecraft.font, label, x + TEXT_PAD, y + 2,
+                account.isLauncher() ? 0xFFD0D0D0 : 0xFF202020);
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
-    private void littleskin_onToggleClick(MouseButtonEvent event, boolean doubleClick, CallbackInfoReturnable<Boolean> cir) {
-        if (doubleClick) {
-            return; // 双击走默认的加入服务器逻辑
-        }
-        if (this.littleskin_pillH <= 0) {
-            return; // 还没有渲染过该条目，无法确定按钮位置
+    private void littleskin_onPillClick(MouseButtonEvent event, boolean doubleClick, CallbackInfoReturnable<Boolean> cir) {
+        if (doubleClick || this.littleskin_pillH <= 0) {
+            return;
         }
         double x = event.x();
         double y = event.y();
-        if (x >= this.littleskin_pillX && x <= this.littleskin_pillX + this.littleskin_pillW
-                && y >= this.littleskin_pillY && y <= this.littleskin_pillY + this.littleskin_pillH) {
-            ModConfig.get().toggleLittleSkinServer(this.serverData.ip);
-            ModConfig.get().save();
-            cir.setReturnValue(true);
+        if (x < this.littleskin_pillX || x > this.littleskin_pillX + this.littleskin_pillW
+                || y < this.littleskin_pillY || y > this.littleskin_pillY + this.littleskin_pillH) {
+            return;
         }
+        Screen current = Minecraft.getInstance().screen;
+        if (current instanceof JoinMultiplayerScreen screen) {
+            Minecraft.getInstance().setScreen(new ServerAccountScreen(
+                    screen, this.serverData.name, this.serverData.ip));
+        }
+        cir.setReturnValue(true);
     }
 }

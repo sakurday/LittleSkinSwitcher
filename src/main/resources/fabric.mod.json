@@ -3,7 +3,7 @@
 	"id": "littleskin-switcher",
 	"version": "${version}",
 	"name": "LittleSkin Switcher",
-	"description": "在游戏内切换正版账户与 LittleSkin 皮肤站登录。默认使用正版登录，每个服务器可单独标记为使用 LittleSkin 登录。",
+	"description": "在游戏内管理多个 Yggdrasil（皮肤站）账户，并为每个服务器单独指定要用哪个账户进入。默认使用启动器登录，LittleSkin 只是其中一个预设地址。皮肤显示请配合 CustomSkinLoader 之类的模组。",
 	"authors": [
 		"sakurday"
 	],
